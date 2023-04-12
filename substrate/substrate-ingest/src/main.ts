@@ -107,9 +107,9 @@ runProgram(async () => {
             })
             await db.connect()
             log.info(`connected to ${removeCredentials(options.out)}`)
-            await migrate({client: db}, path.resolve(__dirname, '../migrations'), {
+            /*await migrate({client: db}, path.resolve(__dirname, '../migrations'), {
                 logger: msg => log.info(msg)
-            })
+            })*/
             let height = await getDbHeight(db)
             if (height == null) {
                 log.info(`starting from block ${startBlock}`)

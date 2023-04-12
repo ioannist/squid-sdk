@@ -435,7 +435,7 @@ class Insert<E> {
                     return name
                 }
             })
-            this.sql = `INSERT INTO ${table} (${names.join(', ')}) SELECT ${cols.join(', ')} FROM unnest(${args.join(', ')}) AS i(${names.join(', ')})`
+            this.sql = `INSERT INTO moonriver_${table} (${names.join(', ')}) SELECT ${cols.join(', ')} FROM unnest(${args.join(', ')}) AS i(${names.join(', ')})`
             if (ignoreDuplicates) {
                 this.sql += ' ON CONFLICT DO NOTHING'
             }
