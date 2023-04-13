@@ -8,6 +8,8 @@ import {formatId} from './parse/util'
 import {toJSON, toJsonString} from './util'
 import WritableStream = NodeJS.WritableStream
 
+let chain = 'moonriver'
+
 
 export interface Sink {
     write(block: BlockData): Promise<void>
@@ -70,7 +72,7 @@ interface AcalaEvmLog {
 
 
 export class PostgresSink implements Sink {
-    private metadataInsert = new Insert<Metadata>('metadata', {
+    private metadataInsert = new Insert<Metadata>(`${chain}_metadata`, {
         id: {cast: 'text'},
         spec_name: {cast: 'text'},
         spec_version: {cast: 'int'},
@@ -79,7 +81,7 @@ export class PostgresSink implements Sink {
         hex: {cast: 'text'}
     }, true)
 
-    private headerInsert = new Insert<Block>('block', {
+    private headerInsert = new Insert<Block>(`${chain}_block`, {
         id: {cast: 'text'},
         height: {cast: 'int'},
         hash: {cast: 'text'},
@@ -91,7 +93,7 @@ export class PostgresSink implements Sink {
         validator: {cast: 'text'}
     })
 
-    private extrinsicInsert = new Insert<Extrinsic>('extrinsic', {
+    private extrinsicInsert = new Insert<Extrinsic>(`${chain}_extrinsic`, {
         id: {cast: 'text'},
         block_id: {cast: 'text'},
         index_in_block: {cast: 'integer'},
@@ -106,7 +108,7 @@ export class PostgresSink implements Sink {
         hash: {cast: 'text', map: toJSON}
     })
 
-    private callInsert = new Insert<Call>('call', {
+    private callInsert = new Insert<Call>(`${chain}_call`, {
         id: {cast: 'text'},
         parent_id: {cast: 'text'},
         block_id: {cast: 'text'},
@@ -119,7 +121,7 @@ export class PostgresSink implements Sink {
         pos: {cast: 'int'}
     })
 
-    private eventInsert = new Insert<Event>('event', {
+    private eventInsert = new Insert<Event>(`${chain}_event`, {
         id: {cast: 'text'},
         block_id: {cast: 'text'},
         index_in_block: {cast: 'int'},
@@ -131,12 +133,12 @@ export class PostgresSink implements Sink {
         pos: {cast: 'int'}
     })
 
-    private warningInsert = new Insert<Warning>('warning', {
+    private warningInsert = new Insert<Warning>(`${chain}_warning`, {
         block_id: {cast: 'text'},
         message: {cast: 'text'}
     })
 
-    private frontierEvmLogInsert = new Insert<FrontierEvmLog>('frontier_evm_log', {
+    private frontierEvmLogInsert = new Insert<FrontierEvmLog>(`${chain}_frontier_evm_log`, {
         event_id: {cast: 'text'},
         contract: {cast: 'text'},
         topic0: {cast: 'text'},
@@ -145,13 +147,13 @@ export class PostgresSink implements Sink {
         topic3: {cast: 'text'}
     })
 
-    private frontierEthereumTransactionInsert = new Insert<FrontierEthereumTransaction>('frontier_ethereum_transaction', {
+    private frontierEthereumTransactionInsert = new Insert<FrontierEthereumTransaction>(`${chain}_frontier_ethereum_transaction`, {
         call_id: {cast: 'text'},
         contract: {cast: 'text'},
         sighash: {cast: 'text'}
     })
 
-    private contractsContractEmittedInsert = new Insert<ContractsContractEmitted>('contracts_contract_emitted', {
+    private contractsContractEmittedInsert = new Insert<ContractsContractEmitted>(`${chain}_contracts_contract_emitted`, {
         event_id: {cast: 'text'},
         contract: {cast: 'text'}
     })
@@ -435,7 +437,7 @@ class Insert<E> {
                     return name
                 }
             })
-            this.sql = `INSERT INTO moonriver_${table} (${names.join(', ')}) SELECT ${cols.join(', ')} FROM unnest(${args.join(', ')}) AS i(${names.join(', ')})`
+            this.sql = `INSERT INTO ${table} (${names.join(', ')}) SELECT ${cols.join(', ')} FROM unnest(${args.join(', ')}) AS i(${names.join(', ')})`
             if (ignoreDuplicates) {
                 this.sql += ' ON CONFLICT DO NOTHING'
             }
