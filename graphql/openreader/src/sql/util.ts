@@ -46,7 +46,7 @@ export class JoinSet {
     }
 
     add(table: string, column: string, rhs: string): string {
-        let key = `${table} ${column} ${rhs}`
+        let key = `moonriver_${table} ${column} ${rhs}`
         let e = this.joins.get(key)
         if (!e) {
             e = {
