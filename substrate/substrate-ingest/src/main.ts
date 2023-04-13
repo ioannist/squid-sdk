@@ -16,6 +16,8 @@ import {PostgresSink, Sink, WritableSink} from './sink'
 
 const log = createLogger('sqd:substrate-ingest')
 
+let chain = 'moonriver'
+
 
 runProgram(async () => {
     let program = new Command()
@@ -177,7 +179,7 @@ runProgram(async () => {
 
 
 async function getDbHeight(db: pg.ClientBase): Promise<number | undefined> {
-    let res = await db.query("SELECT height FROM block ORDER BY height DESC LIMIT 1")
+    let res = await db.query(`SELECT height FROM ${chain}_block ORDER BY height DESC LIMIT 1`)
     if (res.rowCount) {
         return parseInt(res.rows[0].height)
     } else {
